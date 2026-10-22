@@ -4,6 +4,7 @@ import path from 'path'
 import { defineConfig } from 'vite'
 
 import app from './server/app'
+import { devApiControls } from './server/devApiControls'
 
 export default defineConfig({
   plugins: [
@@ -11,6 +12,7 @@ export default defineConfig({
     tailwindcss(),
     {
       configureServer(server) {
+        server.middlewares.use(devApiControls)
         server.middlewares.use(app)
       },
       name: 'api-server'
