@@ -34,7 +34,9 @@ export default function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
   const backId = useId()
 
   return (
-    <div className="relative h-full [perspective:1200px]">
+    // Lift on hover or keyboard focus hints that the card is clickable.
+    // focus-visible (not focus-within) so it doesn't stay lifted after a click.
+    <div className="group relative h-full transition-[translate] duration-200 [perspective:1200px] motion-safe:hover:-translate-y-1 motion-safe:has-[:focus-visible]:-translate-y-1">
       <div
         className={cn(
           'grid h-full transition-transform duration-500 [transform-style:preserve-3d]',
@@ -66,7 +68,7 @@ export default function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
         aria-controls={backId}
         aria-expanded={isFlipped}
         aria-label={`${pokemon.name} details`}
-        className="focus-visible:ring-ring focus-visible:ring-offset-background absolute inset-0 cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        className="hover:ring-foreground/30 focus-visible:ring-ring focus-visible:ring-offset-background absolute inset-0 cursor-pointer rounded-xl ring-1 ring-transparent transition-shadow outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         onClick={() => setIsFlipped(flipped => !flipped)}
         type="button"
       />
@@ -156,11 +158,19 @@ function CardFront({ className, inert, pokemon }: FaceProps) {
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden transition-opacity',
+        'relative flex flex-col overflow-hidden transition-opacity',
         className
       )}
       inert={inert}
     >
+      {/* Always faintly visible so touch users (no hover) also get a hint.
+          Decorative: the button's label already says "details" */}
+      <span
+        aria-hidden="true"
+        className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 text-white/70 transition-colors group-hover:text-white"
+      >
+        <FlipIcon />
+      </span>
       <PokemonImage
         className="aspect-[4/5] w-full"
         id={pokemon.id}
@@ -176,5 +186,24 @@ function CardFront({ className, inert, pokemon }: FaceProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+// Lucide "rotate-cw" (ISC licence), inlined to avoid an icon dependency
+function FlipIcon() {
+  return (
+    <svg
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width="16"
+    >
+      <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+      <path d="M21 3v5h-5" />
+    </svg>
   )
 }
